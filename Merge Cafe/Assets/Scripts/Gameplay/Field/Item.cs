@@ -363,13 +363,9 @@ namespace Gameplay.Field
 
         private void Duplicate(Cell withCell)
         {
-            var itemMaxLevel = GameStorage.Instance.GetItemMaxLevel(withCell.Item.Stats.Type);
-            var duplicatorNormalLevel = 2;
             Remove();
-            var duplicatedItemLevel = withCell.Item.Stats.Level - (duplicatorNormalLevel - Stats.Level);
-            duplicatedItemLevel = Mathf.Clamp(duplicatedItemLevel, 1, itemMaxLevel);
-            SoundManager.Instanse.Play(Sound.Merge, null, duplicatedItemLevel - 1);
-            _currentCell.CreateItem(GameStorage.Instance.GetItem(withCell.Item.Stats.Type, duplicatedItemLevel), withCell.transform.position);
+            SoundManager.Instanse.Play(Sound.Merge, null, withCell.Item.Stats.Level);
+            _currentCell.CreateItem(GameStorage.Instance.GetItem(withCell.Item.Stats.Type, withCell.Item.Stats.Level), withCell.transform.position);
         }
 
         private IEnumerator Shake()
