@@ -4,6 +4,7 @@ using Enums;
 using Gameplay.Field;
 using Gameplay.ItemGenerators;
 using System.Linq;
+using YG;
 
 namespace Service
 {
@@ -45,7 +46,7 @@ namespace Service
         [SerializeField] private GameObject _starForAnimation;
         [SerializeField] private GameObject _brilliantForAnimation;
         [SerializeField] private GameObject _purchaseButton;
-        [SerializeField] private GameObject _sequins;
+        [SerializeField] private ParticleSystem _sequins;
 
         private ItemGeneratorStorage _generatorStorage;
 
@@ -77,7 +78,7 @@ namespace Service
 
         public GameObject PurchaseButton { get => _purchaseButton; }
 
-        public GameObject Sequins { get => _sequins; }
+        public ParticleSystem Sequins { get => _sequins; }
 
         public Transform ItemsParent { get; private set; }
 
@@ -289,6 +290,12 @@ namespace Service
                 Instance = this;
             else
                 Destroy(gameObject);
+
+            Language = YandexGame.EnvironmentData.language switch
+            {
+                "ru" => Language.Russian,
+                _ => Language.English,
+            };
 
             ItemsParent = GetObjectByTag(Tags.ItemsParent).transform;
             cells = GetObjectByTag(Tags.CellsParent).GetComponentsInChildren<Cell>();

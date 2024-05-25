@@ -10,6 +10,7 @@ using Enums;
 using Gameplay.Orders;
 using Gameplay.ItemGenerators;
 using Gameplay.Tutorial;
+using DG.Tweening;
 
 namespace Gameplay.Field
 {
@@ -27,14 +28,15 @@ namespace Gameplay.Field
         [SerializeField] private float _followSpeed;
         [SerializeField] private Image _image;
         [SerializeField] private Animation _mark;
-        [SerializeField] private GameObject _highlightParticlePrefab;
-        [SerializeField] private GameObject _mergeParticlePrefab;
+        [SerializeField] private ParticleSystem _highlightParticlePrefab;
+        [SerializeField] private GameObject[] _mergeParticlePrefabs;
 
         private Animator _animator;
         private Cell _currentCell;
         private Camera _mainCamera;
         private GameStorage _storage;
         private QuickClickTracking _quickClickTracking;
+        private Tween _highlightTween;
         private readonly Vector2 _shakeDelay = new(15f, 30f);
 
         private bool _isReturning = false;
@@ -101,10 +103,19 @@ namespace Gameplay.Field
             ItemsManager.Instance.Remove(this);
             ItemRemoved?.Invoke();
             _currentCell.Clear();
-            Destroy(gameObject);
+            _highlightTween?.Kill();
+            _image.raycastTarget = false;
+            DOVirtual.DelayedCall(Time.deltaTime, () =>
+            {
+                Destroy(gameObject);
+            });
         }
 
-        public void SetActiveParticles(bool value) => _highlightParticlePrefab.SetActive(value);
+        public void SetActiveParticles(bool value)
+        {
+            _highlightTween?.Kill();
+            _highlightTween = _highlightParticlePrefab.transform.DOScale(value ? 15.0f : 0.0f, 0.2f);
+        }
 
         public void SetActiveMark(bool value)
         {
@@ -123,17 +134,21 @@ namespace Gameplay.Field
                 return;
 
             ItemCaptured?.Invoke();
+            _image.raycastTarget = false;
             _isReturning = false;
             transform.SetAsLastSibling();
+            ItemsManager.Instance.CapturedItem = this;
             SoundManager.Instanse.Play(_storage.GetItem(Stats.Type, Stats.Level).TakeSound, null);
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            _image.raycastTarget = true;
             _dragged = false;
+            ItemsManager.Instance.CapturedItem = null;
             ReturnToCell();
 
-            if (!Stats.Movable || (!TutorialSystem.TutorialDone && GetComponent<TutorialTarget>() == null))
+            if (!Stats.Movable || (!TutorialSystem.TutorialDone && !TryGetComponent<TutorialTarget>(out _)))
                 return;
 
             CheckCursorOver();
@@ -143,18 +158,31 @@ namespace Gameplay.Field
         {
             if (Stats.Movable)
             {
-                _animator.SetBool(_zoomAnimatorBool, true);
+                if (ItemsManager.Instance.CapturedItem == null)
+                    _animator.SetBool(_zoomAnimatorBool, true);
                 if (!_dragged)
                     CursorHoveredMovableItem?.Invoke(Stats.Type, Stats.Level);
                 Stats.Unlock();
             }
             else if (!_dragged)
+            {
                 CursorHoveredNotMovableItem?.Invoke(Stats.Type, Stats.Level);
+            }
+            if (!GameStorage.Instance.IsItemMaxLevel(Stats.Type, Stats.Level))
+            {
+                var capturedItem = ItemsManager.Instance.CapturedItem;
+                if (capturedItem != null && capturedItem != this &&
+                    ((capturedItem.Stats.Level == Stats.Level && (capturedItem.Stats.Type == Stats.Type || _storage.IsCombinatingWith(Stats.Type, capturedItem.Stats.Type))) ||
+                    (capturedItem.Stats.Type == ItemType.Duplicator && !Stats.Special)))
+                    SetActiveParticles(true);
+            }
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             CursorLeftItem?.Invoke();
+            if (ItemsManager.Instance.CapturedItem != null)
+                SetActiveParticles(false);
 
             if (!Stats.Movable)
                 return;
@@ -198,7 +226,6 @@ namespace Gameplay.Field
         {
             _isReturning = false;
             _animator.SetTrigger(_disappearAnimatorTrigger);
-            //_currentCell.Clear();
             yield return new WaitForSeconds(0.5f);
             Remove();
         }
@@ -208,25 +235,25 @@ namespace Gameplay.Field
             var hits = GetScreenRaycastResults();
             foreach (var obj in hits)
             {
-                var cell = obj.GetComponent<Cell>();
-                if (cell != null)
+                if (obj.TryGetComponent<Cell>(out var cell))
+                {
                     InteractWithCell(cell);
+                }
                 else
                 {
-                    var order = obj.GetComponent<Order>();
-                    if (order != null)
+                    if (obj.TryGetComponent<Order>(out var order))
+                    {
                         InteractWithOrder(order);
+                    }
                     else
                     {
                         var upgraded = false;
-                        var upgradable = obj.GetComponent<Upgradable>();
-                        if (upgradable != null)
+                        if (obj.TryGetComponent<Upgradable>(out var upgradable))
                             InteractWithUpgradableObject(upgradable, out upgraded);
 
                         if (!upgraded)
                         {
-                            var trashCan = obj.GetComponent<TrashCan>();
-                            if (trashCan != null)
+                            if (obj.TryGetComponent<TrashCan>(out var trashCan))
                                 InteractWithTrashCan(trashCan);
                         }
                     }
@@ -348,7 +375,8 @@ namespace Gameplay.Field
                 var randomCell = _storage.GetRandomEmptyCell();
                 randomCell.CreateItem(_storage.GetItem(ItemType.Star, 1), transform.position);
             }
-            Instantiate(_mergeParticlePrefab, withCell.transform.position, Quaternion.identity);
+            Instantiate(_mergeParticlePrefabs[UnityEngine.Random.Range(0, _mergeParticlePrefabs.Length)],
+                withCell.transform.position, Quaternion.identity);
             ItemsMerged?.Invoke();
         }
 
@@ -365,7 +393,7 @@ namespace Gameplay.Field
         {
             Remove();
             SoundManager.Instanse.Play(Sound.Merge, null, withCell.Item.Stats.Level);
-            _currentCell.CreateItem(GameStorage.Instance.GetItem(withCell.Item.Stats.Type, withCell.Item.Stats.Level), withCell.transform.position);
+            _currentCell.CreateItem(GameStorage.Instance.GetItem(withCell.Item.Stats.Type, withCell.Item.Stats.Level - 1), withCell.transform.position);
         }
 
         private IEnumerator Shake()

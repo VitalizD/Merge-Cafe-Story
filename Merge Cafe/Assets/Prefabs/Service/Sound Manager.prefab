@@ -32,7 +32,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &7508833704888768025
 AudioSource:
@@ -280,10 +280,13 @@ MonoBehaviour:
     - {fileID: 8300000, guid: 239230ed05f60214bb66530fbbadd8be, type: 3}
   - Type: 34
     Clips:
-    - {fileID: 8300000, guid: d111dd8740cf44a41acc686944821b73, type: 3}
+    - {fileID: 8300000, guid: 3ba8f86ff5593ce45813c9b5a7bedf52, type: 3}
   - Type: 35
     Clips:
-    - {fileID: 8300000, guid: d0fbfecb617f834499aeb551b6464d02, type: 3}
+    - {fileID: 8300000, guid: 3ad9bc82897ac75438c1eb4c934388d1, type: 3}
+  - Type: 42
+    Clips:
+    - {fileID: 8300000, guid: 40e34835bd248d64598f064134dd6cf1, type: 3}
   - Type: 36
     Clips:
     - {fileID: 8300000, guid: 624eb132511131f42a38f3c7b8024a6b, type: 3}

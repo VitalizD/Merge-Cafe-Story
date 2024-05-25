@@ -30,7 +30,6 @@ namespace Gameplay
         {
             ClearProducedItemsList();
             Show(title, level, description, instruction);
-            //_producedItemsGroup.gameObject.SetActive(false);
         }
 
         public void ShowGenerator(string title, int level, string description, Sprite[] producedItemSprites,
@@ -42,6 +41,7 @@ namespace Gameplay
             if (producedItemSprites == null)
                 return;
 
+            _producedItemsGroup.gameObject.SetActive(true);
             foreach (var sprite in producedItemSprites)
             {
                 var newItem = Instantiate(_producedItemPrefab, _producedItemsGroup);
@@ -105,6 +105,7 @@ namespace Gameplay
             foreach (var producedItem in _producedItems)
                 Destroy(producedItem);
             _producedItems.Clear();
+            _producedItemsGroup.gameObject.SetActive(false);
         }
     }
 }

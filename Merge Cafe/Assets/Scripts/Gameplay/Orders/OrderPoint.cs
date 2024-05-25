@@ -15,7 +15,6 @@ namespace Gameplay.Orders
         [SerializeField] private Color _availableCellColor;
 
         private Image _background;
-        private Color _defaultCellColor;
 
         private ItemType _itemType;
         private int _itemLevel;
@@ -23,7 +22,9 @@ namespace Gameplay.Orders
         public static event Action<ItemType, int> CursorHoveredItemInOrder;
         public static event Action<ItemType, int> CursorExitItemInOrder;
 
-        public Image Background => _background;
+        public Color DefaultCellColor { get; private set; }
+
+        public Color CurrentCellColor { get; set; }
 
         public Image Icon { get => _icon; }
 
@@ -43,7 +44,7 @@ namespace Gameplay.Orders
 
             _checkMarkAvailable.gameObject.SetActive(value);
             if (value) _checkMarkAvailable.Play();
-            _background.color = value ? _availableCellColor : _defaultCellColor;
+            _background.color = value ? _availableCellColor : CurrentCellColor;
         }
 
         public void OnPointerEnter(PointerEventData eventData)
@@ -59,7 +60,7 @@ namespace Gameplay.Orders
         private void Awake()
         {
             _background = GetComponent<Image>();
-            _defaultCellColor = _background.color;
+            DefaultCellColor = _background.color;
         }
     }
 

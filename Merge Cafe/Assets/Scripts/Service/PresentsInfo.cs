@@ -25,8 +25,7 @@ namespace Service
                     new Content(ItemType.Brilliant, 2, 3, 5),
                     new Content(ItemType.Key, 1, 2, 1),
                     new Content(ItemType.Box, 1, 1, 2),
-                    new Content(ItemType.Doubler, 1, 1, 1),
-                    new Content(ItemType.Duplicator, 1, 1, 1),
+                    new Content(ItemType.Doubler, 1, 1, 1)
                 },
                 new[]
                 {
@@ -35,8 +34,8 @@ namespace Service
                     new Content(ItemType.Brilliant, 2, 4, 7),
                     new Content(ItemType.Key, 1, 2, 2),
                     new Content(ItemType.Box, 1, 2, 3),
-                    new Content(ItemType.Doubler, 1, 1, 1),
-                    new Content(ItemType.Duplicator, 1, 2, 1),
+                    new Content(ItemType.Doubler, 1, 1, 2),
+                    new Content(ItemType.Duplicator, 1, 1, 1),
                 },
             };
         }

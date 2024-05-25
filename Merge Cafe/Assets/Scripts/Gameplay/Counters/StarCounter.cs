@@ -36,6 +36,7 @@ namespace Gameplay.Counters
         private (ItemType Type, int Level) _currentReward;
         private float _currentBarValue = 0f;
         private int _needStarsToNextReward = 10;
+        private bool _isMax;
 
         public int Level { get; private set; } = 1;
 
@@ -116,6 +117,9 @@ namespace Gameplay.Counters
 
         private void Update()
         {
+            if (_isMax)
+                return;
+
             _currentBarValue = Mathf.Lerp(_currentBarValue, _storage.StarsCount, barSpeed * Time.deltaTime);
             _bar.SetValue(_currentBarValue / _needStarsToNextReward * 100f);
 
@@ -132,7 +136,8 @@ namespace Gameplay.Counters
             if (settings == null)
             {
                 _nextPresent.gameObject.SetActive(false);
-                _needStarsToNextReward = 999999;
+                //_needStarsToNextReward = 999999;
+                _isMax = true;
                 return;
             }
             if (_storage.OrdersCountMustBeUpdated)
@@ -145,7 +150,9 @@ namespace Gameplay.Counters
         private void UpdateValuesText()
         {
             _levelText.text = Level.ToString();
-            _starsText.text = $"{_storage.StarsCount} / {_needStarsToNextReward}";
+            _starsText.text = _isMax 
+                ? _storage.StarsCount.ToString()
+                : $"{_storage.StarsCount} / {_needStarsToNextReward}";
         }
 
         private void FinishTarget()
@@ -177,7 +184,9 @@ namespace Gameplay.Counters
                 SetRewardsByGameStage();
             }
             else
+            {
                 NextReward();
+            }
 
             UpdateValuesText();
             SoundManager.Instanse.Play(Sound.NewPresent, null);

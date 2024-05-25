@@ -661,7 +661,7 @@ MonoBehaviour:
   _starForAnimation: {fileID: 6292305270132265545, guid: a10a6f79787d7b4438baac93bdf8bb80, type: 3}
   _brilliantForAnimation: {fileID: 4586205405515532584, guid: 651c76dbca8f4e649bd401641c565975, type: 3}
   _purchaseButton: {fileID: 1639655627784866526, guid: 12b9b1262a224de4083c00b067660feb, type: 3}
-  _sequins: {fileID: 61704947291243123, guid: 5c098ee6ebb339948b4db39aade7d054, type: 3}
+  _sequins: {fileID: 4033412786151888120, guid: 49057b33ea71fbb4da4e8f02a8db9f28, type: 3}
 --- !u!114 &2737563057547967188
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -54,7 +54,6 @@ namespace Gameplay.Orders
         private int _reward—oefficient;
         private Color _defaultValueColor;
         private Color _defaultBackgroundColor;
-        private Color _defaultPointColor;
 
         public static event System.Action RewardsAdded;
         public static event System.Action<int> OrderDone;
@@ -242,16 +241,16 @@ namespace Gameplay.Orders
                 _starsValueText.color = _doubledRewardValueColor;
                 _brilliantsValueText.color = _doubledRewardValueColor;
                 _background.color = _doubledBackgroundColor;
-                //foreach (var point in _orderPoints)
-                //    point.Background.color = _doubledPointColor;
+                foreach (var point in _orderPoints)
+                    point.CurrentCellColor = _doubledPointColor;
             }
             else
             {
                 _starsValueText.color = _defaultValueColor;
                 _brilliantsValueText.color = _defaultValueColor;
                 _background.color = _defaultBackgroundColor;
-                //foreach (var point in _orderPoints)
-                //    point.Background.color = _defaultPointColor;
+                foreach (var point in _orderPoints)
+                    point.CurrentCellColor = point.DefaultCellColor;
             }
         }
 
@@ -260,7 +259,6 @@ namespace Gameplay.Orders
             _animator = GetComponent<Animator>();
             _defaultValueColor = _starsValueText.color;
             _defaultBackgroundColor = _background.color;
-            _defaultPointColor = _orderPoints[0].Background.color;
         }
 
         private void Start()

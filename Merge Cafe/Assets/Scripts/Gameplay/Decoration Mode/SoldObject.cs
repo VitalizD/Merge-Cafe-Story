@@ -3,6 +3,7 @@ using Service;
 using Enums;
 using EventHandlers;
 using Gameplay.Tutorial;
+using DG.Tweening;
 
 namespace Gameplay.DecorationMode
 {
@@ -61,7 +62,8 @@ namespace Gameplay.DecorationMode
                 _canBuy = false;
                 _purchased = true;
                 gameObject.SetActive(!_hideable);
-                Instantiate(GameStorage.Instance.Sequins, transform.position, Quaternion.identity, transform.parent);
+                var sequins = Instantiate(GameStorage.Instance.Sequins, transform.position, Quaternion.identity);
+                DOVirtual.DelayedCall(2.0f, () => sequins.Stop());
                 foreach (var nextSellObject in _nextObjectsForSell)
                     nextSellObject.Activate();
                 if (_dialogActivationPoint != null)

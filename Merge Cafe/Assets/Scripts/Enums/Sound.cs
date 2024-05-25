@@ -44,5 +44,6 @@ namespace Enums
         TrashCan,
         OpenWindow,
         CloseWindow,
+        BoxOpen
     }
 }

@@ -41,7 +41,6 @@ namespace Gameplay.Field
             else if (_type == CurrencyType.Brilliant) reward = storage.GetBrilliantsRewardByItemlevel(_item.Stats.Level);
             currencyAdder.Add(_type, reward, transform.position);
             _item.Remove();
-            SoundManager.Instanse.Play(Sound.Call, null);
             Collected?.Invoke();
         }
     }

@@ -5,6 +5,7 @@ using Service;
 using Enums;
 using System.Collections;
 using System;
+using DG.Tweening;
 
 namespace Gameplay.ItemGenerators
 {
@@ -16,9 +17,9 @@ namespace Gameplay.ItemGenerators
         private const string _burnAnimatorTrigger = "Burn";
 
         [SerializeField] private Image _image;
-        [SerializeField] private GameObject _particles;
         [SerializeField] private ItemType _type;
         [SerializeField] private int _level = 1;
+        [SerializeField] private Transform _highlightParticle;
 
         private Animator _animator;
         private ItemGenerator _itemGenerator;
@@ -85,11 +86,15 @@ namespace Gameplay.ItemGenerators
         /// </summary>
         public void SetLevel(int level) => _level = level;
 
+        public void SetActiveHighlightParticle(bool value)
+        {
+            _highlightParticle.DOScale(value ? 30.0f : 0.0f, 0.2f);
+        }
+
         private void Awake()
         {
             _animator = GetComponent<Animator>();
             _itemGenerator = GetComponent<ItemGenerator>();
-            _particles.SetActive(false);
         }
 
         private void Start()
@@ -116,7 +121,9 @@ namespace Gameplay.ItemGenerators
         {
             _animator.SetTrigger(_burnAnimatorTrigger);
             GameStorage.Instance.RemoveItemsHighlight();
-            _particles.SetActive(false);
+            SetActiveHighlightParticle(false);
+            var sequins = Instantiate(GameStorage.Instance.Sequins, transform.position, Quaternion.identity);
+            DOVirtual.DelayedCall(2.0f, () => sequins.Stop());
             ++_level;
             SoundManager.Instanse.Play(Sound.UnlockCell, null);
             Upgraded?.Invoke();
@@ -129,7 +136,8 @@ namespace Gameplay.ItemGenerators
         private IEnumerator CheckMergingItemOnField()
         {
             yield return new WaitForSeconds(2f);
-            _particles.SetActive(GameStorage.Instance.FieldHasItem(GameStorage.Instance.GetItem(_type, _level)));
+            if (GameStorage.Instance.FieldHasItem(GameStorage.Instance.GetItem(_type, _level)))
+                SetActiveHighlightParticle(true);
             StartCoroutine(CheckMergingItemOnField());
         }
     }

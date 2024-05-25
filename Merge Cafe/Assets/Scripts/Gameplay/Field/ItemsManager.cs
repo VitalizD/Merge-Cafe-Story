@@ -10,6 +10,8 @@ namespace Gameplay.Field
 
         private readonly Dictionary<ItemType, Dictionary<int, List<Item>>> _storage = new();
 
+        public Item CapturedItem { get; set; }
+
         public void Add(Item item)
         {
             var stats = item.Stats;

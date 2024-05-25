@@ -32,7 +32,7 @@ namespace Gameplay.Field
             {
                 Activated?.Invoke(_ordersToDoubleDependingOnLevel[_item.Stats.Level]);
                 SoundManager.Instanse.Play(Enums.Sound.SpeedUp, null);
-                Destroy(gameObject);
+                _item.Remove();
             }
         }
     }

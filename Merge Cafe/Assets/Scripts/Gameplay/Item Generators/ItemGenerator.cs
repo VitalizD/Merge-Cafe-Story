@@ -13,7 +13,7 @@ namespace Gameplay.ItemGenerators
 {
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(Upgradable))]
-    public class ItemGenerator : MonoBehaviour, IPointerDownHandler
+    public class ItemGenerator : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerExitHandler
     {
         private const float _tick = 0.01f;
         private const string _clickAnimatorBool = "Click";
@@ -68,6 +68,7 @@ namespace Gameplay.ItemGenerators
             _remainItemsToSlowingDown += onItemCount;
             _energyIcon.SetActive(true);
             SoundManager.Instanse.Play(Sound.SpeedUp, null);
+            _upgradable.SetActiveHighlightParticle(false);
             Speeded?.Invoke();
         }
 
@@ -86,8 +87,7 @@ namespace Gameplay.ItemGenerators
         {
             _currentGeneratedItems.Clear();
             var settings = GameStage.GetSettingsByStage(_storage.GameStage);
-            if (settings == null)
-                settings = GameStage.GetSettingsByLastStage();
+            settings ??= GameStage.GetSettingsByLastStage();
             foreach (var item in settings.Items)
             {
                 if (System.Array.Exists(_generatedItems, type => type == item.Type))
@@ -107,6 +107,19 @@ namespace Gameplay.ItemGenerators
             _currentGenerationTime += _statsOnLevels[_upgradable.Level - 1].clickIncreaseSeconds;
             UpdateBar();
             CheckBarFilled();
+        }
+
+        public void OnPointerEnter(PointerEventData eventData)
+        {
+            var capturedItem = ItemsManager.Instance.CapturedItem;
+            if (capturedItem != null && capturedItem.Stats.Type == ItemType.Energy)
+                _upgradable.SetActiveHighlightParticle(true);
+        }
+
+        public void OnPointerExit(PointerEventData eventData)
+        {
+            if (ItemsManager.Instance.CapturedItem != null)
+                _upgradable.SetActiveHighlightParticle(false);
         }
 
         private void Awake()
